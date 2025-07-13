@@ -7,21 +7,29 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
-
 class User extends Authenticatable
 {
-    use HasApiTokens, HasFactory, Notifiable;
+    use HasApiTokens, Notifiable;
+
 
     /**
      * The attributes that are mass assignable.
      *
      * @var array<int, string>
      */
+    protected $table = 'users';
     protected $fillable = [
-        'Full_name',
-        'Email',
-        'Password',
-        'api_token'
+        'full_name',
+        'email',
+        'password',
+        'phone',
+        'national_id',
+        'address',
+        'driving_license',
+        'license_number',
+        'role',
+        'is_driving_mode',
+        'distracting_apps',
     ];
 
     /**
@@ -41,6 +49,8 @@ class User extends Authenticatable
      */
     protected $casts = [
         'email_verified_at' => 'datetime',
+        'is_driving_mode' => 'boolean',
+        'distracting_apps' => 'array',
     ];
     public function vehicles() {
         return $this->hasMany(Vehicle::class);

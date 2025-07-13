@@ -15,15 +15,16 @@ class CreateUsersTable extends Migration
     {
         Schema::create('users', function (Blueprint $table) {
             $table->id();
-            $table->string('Full_name');
-            $table->string('Email')->unique();
-            $table->string('Password');
-            $table->string('phone_number')->nullable();
+            $table->string('full_name');
+            $table->string('email')->unique();
+            $table->string('password');
+            $table->string('phone')->nullable();
+            $table->string('national_id')->unique()->nullable();
             $table->string('driving_license')->nullable(); // Field to store driving license image
+            $table->string('license_number');
             $table->string('job_title')->nullable(); // Field for job title
-            $table->string('location')->nullable(); // Field for location
-            $table->enum('role', ['user', 'admin'])->default('user');
-            $table->string('api_token', 60)->unique();
+            $table->string('address')->nullable(); // Field for location
+            $table->enum('role', ['driver', 'admin'])->default('driver');
             $table->timestamps();
         });
     }

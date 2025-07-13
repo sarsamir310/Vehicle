@@ -8,6 +8,13 @@ use Illuminate\Database\Eloquent\Model;
 class Violation extends Model
 {
     use HasFactory;
+    protected $fillable = [
+        'user_id',
+        'vehicle_id',
+        'violation_type',
+        'evidence_status',
+        'timestamp',
+    ];
     public function user() {
         return $this->belongsTo(User::class);
     }
@@ -15,4 +22,5 @@ class Violation extends Model
     public function vehicle() {
         return $this->belongsTo(Vehicle::class);
     }
+
 }

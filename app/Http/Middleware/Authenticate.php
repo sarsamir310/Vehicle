@@ -18,4 +18,8 @@ class Authenticate extends Middleware
             return route('login');
         }
     }
+    protected function unauthenticated($request, array $guards)
+    {
+        throw new \Illuminate\Auth\AuthenticationException('Unauthenticated.', $guards);
+    }
 }

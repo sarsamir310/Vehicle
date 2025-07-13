@@ -1,8 +1,11 @@
 <?php
 
-use App\Http\Controllers\AuthController;
+use App\Http\Controllers\Auth\AuthController;
+use App\Http\Controllers\Auth\PasswordResetController;
 use App\Http\Controllers\CarControlController;
 use App\Http\Controllers\DriverMonitoringController;
+use App\Http\Controllers\DrivingLicenseController;
+use App\Http\Controllers\DrivingModeController;
 use App\Http\Controllers\EmergencyController;
 use App\Http\Controllers\LogController;
 use App\Http\Controllers\NotificationController;
@@ -27,42 +30,58 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 });
 
 // AuthController
-
-Route::post('/register', [AuthController::class, 'register']);
+Route::post('/register-step1', [AuthController::class, 'registerStep1']);
+Route::post('/register-step2', [AuthController::class, 'registerStep2']);
 Route::post('/login', [AuthController::class, 'login']);
-Route::post('logout', [AuthController::class,'logout'])->middleware('auth:api');// look for auth.php and make api guard
-Route::post('generate-otp', [AuthController::class, 'generateOtp']);
-Route::post('validate-otp', [AuthController::class, 'validateOtp']);
-Route::post('/password/email', [AuthController::class, 'sendResetLink']);
-Route::post('/password/reset', [AuthController::class, 'reset'])->name('password.update');
+Route::post('/generate-otp', [AuthController::class, 'generateOtp']);
+Route::post('/validate-otp', [AuthController::class, 'validateOtp']);
 
-// Add this named route for password reset
-Route::get('/password/reset', function ($token) {
-    // This can redirect to a frontend reset page if needed.
-})->name('password.reset');
-// LogController
+// Protect routes with auth:sanctum middleware
+Route::middleware('auth:sanctum')->group(function () {
+    Route::post('/logout', [AuthController::class, 'logout']);
+});
+Route::post('/send-otp', [PasswordResetController::class, 'sendOtp']);
+Route::post('/verify-otp', [PasswordResetController::class, 'verifyOtp']);
+Route::post('/reset-password', [PasswordResetController::class, 'resetPassword']);
 Route::get('/logs', [LogController::class, 'fetchLogs']);
 Route::post('/logs', [LogController::class, 'addLog']);
 
 // CarControlController
 Route::post('/speed-control', [CarControlController::class, 'issueWarning']);
 
-// ViolationController
-Route::get('/violations', [ViolationController::class, 'list']);
-Route::post('/violations/evidence', [ViolationController::class, 'uploadEvidence']);
+//Violation
+//Route::get('/check-violations', [EmergencyController::class, 'checkAndLogViolations']);
+
 
 // EmergencyController
-Route::post('/emergency', [EmergencyController::class, 'requestOverride']);
-Route::post('/emergency/evidence', [EmergencyController::class, 'uploadEvidence']);
+Route::post('/emergency-request', [EmergencyController::class, 'createEmergencyRequest']);
+Route::post('/upload-evidence', [EmergencyController::class, 'uploadEvidence']);
+Route::get('/check-violations', [EmergencyController::class, 'checkForViolations']);
 
 // DriverMonitoringController
 Route::get('/monitor', [DriverMonitoringController::class, 'getMonitoringData']);
 
 // NotificationController
-Route::get('/notifications', [NotificationController::class, 'list']);
-Route::post('/notifications/read', [NotificationController::class, 'markAsRead']);
+/*Route::middleware('auth:sanctum')->group(function () {
+    Route::get('/notifications', [NotificationController::class, 'index']);
+    Route::post('/notifications', [NotificationController::class, 'store']);
+    Route::put('/notifications/{id}/read', [NotificationController::class, 'markAsRead']);
+});*/
+
 
 // ProfileController
-Route::get('/profile', [ProfileController::class, 'show']);
-Route::put('/profile', [ProfileController::class, 'update']);
+//Route::middleware('auth:api')->group(function () {
+//Route::post('/profile/update', [ProfileController::class, 'updateProfile']);
+Route::middleware('auth:sanctum')->group(function () {
+    Route::get('/profile', [ProfileController::class, 'show']);
+    Route::post('/profile', [ProfileController::class, 'update']);
+    Route::post('/driving-mode/toggle', [DrivingModeController::class, 'toggleDrivingMode']);
+    Route::post('/driving-mode/apps', [DrivingModeController::class, 'updateDistractingApps']);
+    Route::get('/driving-mode', [DrivingModeController::class, 'getDrivingMode']);
+});
+//Route::post('/save-device-token', [NotificationController::class, 'saveToken']);
+//Route::post('/send-notification', [NotificationController::class, 'sendPushNotification']);
+
+
+
 
